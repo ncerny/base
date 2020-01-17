@@ -31,12 +31,6 @@ hab pkg install $pkg_origin/$pkg_name --channel ${channel} --url ${bldr_url}
 echo "Creating configuration overrides"
 mkdir -p /hab/user/${pkg_name}/config/
 cat > /hab/user/${pkg_name}/config/user.toml <<EOF
-[attributes]
-  pkg_origin  = "${pkg_origin}"
-  pkg_name    = "${pkg_name}"
-  pkg_channel = "${channel}"
-  bldr_url    = "${bldr_url}"
-
 [chef_license]
 acceptance = "accept"
 

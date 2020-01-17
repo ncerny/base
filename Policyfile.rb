@@ -15,3 +15,8 @@ named_run_list :bootstrap, 'base::bootstrap'
 
 # Specify a custom source for a single cookbook:
 cookbook 'base', path: '.'
+
+default['pkg_name'] = 'base'
+default['pkg_origin'] = 'ncerny'
+default['pkg_channel'] = 'stable'
+default['bldr_url'] = 'https://bldr.habitat.sh'
