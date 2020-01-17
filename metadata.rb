@@ -4,7 +4,7 @@ maintainer_email 'ncerny@gmail.com'
 license 'All Rights Reserved'
 description 'Installs/Configures base'
 long_description 'Installs/Configures base'
-version '0.1.0'
+version ::File.read('VERSION')
 chef_version '>= 14.0'
 
 # The `issues_url` points to the location where issues for this cookbook are

@@ -21,7 +21,12 @@ verifier:
   name: inspec
 
 platforms:
-  - name: ubuntu-18.04
+  - name: tas50/windows_2019
+    provisioner:
+      wait_for_retry: 300
+    transport:
+      name: winrm
+      elevated: true
   - name: centos-7
 
 suites:

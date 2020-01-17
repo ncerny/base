@@ -1,0 +1,10 @@
+pkg_name=base
+pkg_origin=ncerny
+pkg_version=$(cat ../VERSION)
+pkg_maintainer="Nathan Cerny <ncerny@gmail.com>"
+pkg_license=("Apache-2.0")
+pkg_upstream_url="http://chef.io"
+pkg_scaffolding="chef/scaffolding-chef-infra"
+pkg_svc_user=("root")
+scaffold_policy_name="Policyfile"
+scaffold_policyfile_path="${PLAN_CONTEXT}/../"

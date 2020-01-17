@@ -1,7 +1,7 @@
 #
 # Cookbook:: base
-# Recipe:: default
+# Recipe:: sshd
 #
 # Copyright:: 2019, Nathan Cerny, All Rights Reserved.
 
-include_recipe "#{cookbook_name}::sshd"
+package 'openssh-server'
