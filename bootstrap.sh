@@ -3,8 +3,6 @@
 pkg_origin='ncerny'
 pkg_name='base'
 channel='stable'
-topology='standalone'
-strategy='at-once'
 bldr_url='https://bldr.habitat.sh'
 
 
@@ -28,11 +26,17 @@ echo "By running this script, you accept the Chef license agreement"
 hab license accept
 
 echo "Installing $pkg_origin/$pkg_name"
-hab pkg install $pkg_origin/$pkg_name
+hab pkg install $pkg_origin/$pkg_name --channel ${channel} --url ${bldr_url}
 
 echo "Creating configuration overrides"
 mkdir -p /hab/user/${pkg_name}/config/
 cat > /hab/user/${pkg_name}/config/user.toml <<EOF
+[attributes]
+  pkg_origin  = "${pkg_origin}"
+  pkg_name    = "${pkg_name}"
+  pkg_channel = "${channel}"
+  bldr_url    = "${bldr_url}"
+
 [chef_license]
 acceptance = "accept"
 
@@ -48,6 +52,4 @@ pkg_prefix=$(find /hab/pkgs/$pkg_origin/$pkg_name -maxdepth 2 -mindepth 2 | sort
 echo "Found $pkg_prefix"
 
 cd $pkg_prefix
-hab pkg exec $pkg_origin/$pkg_name chef-client -z -c $pkg_prefix/config/bootstrap-config.rb --chef_license accept
-
-hab svc load $pkg_origin/$pkg_name --channel ${channel} --topology ${topology} --strategy ${strategy} --url ${bldr_url}
+hab pkg exec $pkg_origin/$pkg_name chef-client -z -c $pkg_prefix/config/bootstrap-config.rb --named-run-list bootstrap --chef_license accept

@@ -11,6 +11,7 @@ default_source :supermarket
 
 # run_list: chef-client will run these recipes in the order specified.
 run_list 'base::default'
+named_run_list :bootstrap, 'base::bootstrap'
 
 # Specify a custom source for a single cookbook:
 cookbook 'base', path: '.'
