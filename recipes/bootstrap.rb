@@ -14,4 +14,5 @@ hab_service "#{node['pkg_origin']}/#{node['pkg_name']}" do
   channel node['pkg_channel']
   strategy 'at-once'
   topology 'standalone'
+  retries 3
 end

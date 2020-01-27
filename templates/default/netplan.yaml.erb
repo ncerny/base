@@ -1,0 +1,65 @@
+<%
+    @netconf = 
+      if ::File.exist?('/sys/bus/pci/drivers/mlx4_core')
+        # Dell Poweredge Compute Nodes
+        {
+          infra_nic: 'eno1',
+          match: 'driver: mlx4_core',
+          parameters: {
+            mode: 'balance-rr',
+            'mii-monitor-interval': '100'
+          }
+        }
+      elsif ::File.exist?('/sys/bus/pci/drivers/ixgbe')
+        # Dell C6100 Storage Nodes
+        {
+          infra_nic: 'eno1',
+          match: 'driver: ixgbe',
+          parameters: {
+            mode: '802.3ad',
+            'lacp-rate': 'slow'
+          }
+        }
+      else
+        # Vagrant
+        {
+          infra_nic: 'eth0',
+          match: 'name: eth1',
+          parameters: {
+            mode: 'balance-rr',
+            'mii-monitor-interval': '100'
+          }
+        }
+      end
+-%>
+network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    <%= @netconf[:infra_nic] %>:
+      dhcp4: yes
+      dhcp6: yes
+      dhcp4-overrides:
+        route-metric: 200
+      dhcp6-overrides:
+        route-metric: 200
+    switchports:
+      mtu: 9000
+      match:
+        <%= @netconf[:match] %>
+  bonds:
+    bond0:
+      dhcp4: yes
+      dhcp6: yes
+      dhcp4-overrides:
+        route-metric: 100
+      dhcp6-overrides:
+        route-metric: 100
+      mtu: 9000
+      interfaces: [switchports]
+      <%- if @netconf[:parameters] %>
+      parameters:
+      <%- @netconf[:parameters].each do |k,v| %>
+        <%= k %>: <%= v %>
+      <%- end %>
+      <%- end %>
