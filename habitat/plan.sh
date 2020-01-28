@@ -8,3 +8,4 @@ pkg_scaffolding="chef/scaffolding-chef-infra"
 pkg_svc_user=("root")
 scaffold_policy_name="Policyfile"
 scaffold_policyfile_path="${PLAN_CONTEXT}/../"
+scaffold_chef_client=chef/chef-infra-client
