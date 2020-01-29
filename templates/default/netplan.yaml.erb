@@ -4,7 +4,7 @@
         # Dell Poweredge Compute Nodes
         {
           infra_nic: 'eno1',
-          match: 'driver: mlx4_core',
+          match: 'driver: mlx4_en',
           parameters: {
             mode: 'balance-rr',
             'mii-monitor-interval': '100'
@@ -38,11 +38,10 @@ network:
   ethernets:
     <%= @netconf[:infra_nic] %>:
       dhcp4: yes
-      dhcp6: yes
+      dhcp6: no
       dhcp4-overrides:
-        route-metric: 200
-      dhcp6-overrides:
-        route-metric: 200
+        use-routes: false
+        use-dns: false
     switchports:
       mtu: 9000
       match:
@@ -63,3 +62,14 @@ network:
         <%= k %>: <%= v %>
       <%- end %>
       <%- end %>
+  vlans:
+    kc:
+      id: 2
+      link: bond0
+      dhcp4: yes
+      dhcp6: no
+      dhcp4-overrides:
+        use-dns: false
+        use-routes: false
+        send-hostname: false
+        use-hostname: false
