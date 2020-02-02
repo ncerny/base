@@ -18,23 +18,29 @@ end
   net.bridge.bridge-nf-call-iptables
   net.bridge.bridge-nf-call-ip6tables
 ).each do |param|
-sysctl param do
-  value 1
+  sysctl param do
+    value 1
+  end
 end
 
-package 'software-properties-common'
+%w( software-properties-common apt-transport-https ).each do |pkg|
+  package pkg
+end
 
 apt_repository 'crio' do
   uri 'ppa:projectatomic/ppa'
 end
 
-package 'cri-o-1.15'
-
-service 'crio' do
-  action [ :start, :enable ]
+%w( cri-o-1.15 conmon podman ).each do |pkg|
+  package pkg
 end
 
-package 'apt-transport-https'
+# No clue why this isn't created with the packages
+directory '/usr/libexec/crio/conmon'
+
+service 'crio' do
+  action [ :enable, :start ]
+end
 
 apt_repository 'kubernetes' do
   uri 'https://apt.kubernetes.io/'
@@ -43,7 +49,7 @@ apt_repository 'kubernetes' do
   key 'https://packages.cloud.google.com/apt/doc/apt-key.gpg'
 end
 
-%w( kubelet kubeadm kubectl ).each do |pkg|
+%w( kubernetes-cni kubelet kubeadm kubectl ).each do |pkg|
   package pkg
 
   execute "apt-mark hold #{pkg}" do
@@ -52,5 +58,5 @@ end
 end
 
 service 'kubelet' do
-  action [ :start, :enable ]
+  action [ :enable, :start ]
 end
