@@ -39,9 +39,13 @@ network:
     <%= @netconf[:infra_nic] %>:
       dhcp4: yes
       dhcp6: no
-      dhcp4-overrides:
-        use-routes: false
-        use-dns: false
+    routes:
+      - to: 192.168.10.0/24
+        via: 192.168.10.1
+        table: 101
+    routing-policy:
+      - from: 192.168.10.0/24
+        table: 101
     switchports:
       mtu: 9000
       match:
@@ -50,10 +54,6 @@ network:
     bond0:
       dhcp4: yes
       dhcp6: yes
-      dhcp4-overrides:
-        route-metric: 100
-      dhcp6-overrides:
-        route-metric: 100
       mtu: 9000
       interfaces: [switchports]
       <%- if @netconf[:parameters] %>
@@ -62,14 +62,16 @@ network:
         <%= k %>: <%= v %>
       <%- end %>
       <%- end %>
+      routes:
+        - to: 192.168.100.0/24
+          via: 192.168.100.1
+          table: 102
+      routing-policy:
+        - from: 192.168.100.0/24
+          table: 102
   vlans:
     kc:
       id: 2
       link: bond0
-      dhcp4: yes
+      dhcp4: no
       dhcp6: no
-      dhcp4-overrides:
-        use-dns: false
-        use-routes: false
-        send-hostname: false
-        use-hostname: false
