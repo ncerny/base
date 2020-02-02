@@ -31,7 +31,7 @@ apt_repository 'crio' do
   uri 'ppa:projectatomic/ppa'
 end
 
-%w( cri-o-1.15 conmon podman ).each do |pkg|
+%w( cri-o-1.15 conmon podman runc ).each do |pkg|
   package pkg
 end
 
@@ -39,6 +39,18 @@ end
 directory '/usr/libexec/crio/conmon'
 
 service 'crio' do
+  action [ :enable, :start ]
+end
+
+link '/usr/bin/rm' do
+  to '/bin/rm'
+end
+
+link '/usr/bin/bash' do
+  to '/bin/bash'
+end
+
+service 'crio-shutdown' do
   action [ :enable, :start ]
 end
 
