@@ -3,7 +3,6 @@ maintainer 'Nathan Cerny'
 maintainer_email 'ncerny@gmail.com'
 license 'All Rights Reserved'
 description 'Installs/Configures base'
-long_description 'Installs/Configures base'
 version ::File.read('VERSION')
 chef_version '>= 15.2'
 
@@ -20,3 +19,4 @@ chef_version '>= 15.2'
 # source_url 'https://github.com/<insert_org_here>/base'
 
 depends 'habitat'
+depends 'hostsfile'

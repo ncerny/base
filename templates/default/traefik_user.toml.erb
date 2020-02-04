@@ -1,0 +1,21 @@
+[entryPoints]
+  [entryPoints.web]
+    address = ":80"
+  [entryPoints.websecure]
+    address = ":443"
+[http.routers]
+  [http.routers.kubernetes]
+    entryPoints = ["websecure"]
+    rule = "Host(`kubernetes.management`)"
+    service = "kubernetes"
+    [http.routers.kubernetes.tls]
+      passthrough: "true"
+[http.services]
+  [http.services.kubernetes.loadBalancer]
+    [[http.services.kubernetes.loadBalancer.servers]]
+      url = "https://virt01.management:6443"
+    [[http.services.kubernetes.loadBalancer.servers]]
+      url = "https://virt02.management:6443"
+    [[http.services.kubernetes.loadBalancer.servers]]
+      url = "https://virt03.management:6443"
+    [http.services.kubernetes.loadBalancer.sticky.cookie]
