@@ -1,3 +1,6 @@
+[api]
+  dashboard = true
+  insecure = true
 [entryPoints]
   [entryPoints.web]
     address = ":80"
@@ -18,4 +21,3 @@
       url = "https://virt02.management:6443"
     [[http.services.kubernetes.loadBalancer.servers]]
       url = "https://virt03.management:6443"
-    [http.services.kubernetes.loadBalancer.sticky.cookie]
