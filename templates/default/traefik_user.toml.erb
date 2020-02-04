@@ -9,7 +9,7 @@
     rule = "Host(`kubernetes.management`)"
     service = "kubernetes"
     [http.routers.kubernetes.tls]
-      passthrough: "true"
+      passthrough = "true"
 [http.services]
   [http.services.kubernetes.loadBalancer]
     [[http.services.kubernetes.loadBalancer.servers]]
