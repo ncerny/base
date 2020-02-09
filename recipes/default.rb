@@ -6,4 +6,5 @@
 
 include_recipe "#{cookbook_name}::sshd"
 include_recipe "#{cookbook_name}::network"
+include_recipe "#{cookbook_name}::disable_swap"
 include_recipe "#{cookbook_name}::kubernetes"

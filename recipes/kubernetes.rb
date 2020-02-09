@@ -35,8 +35,13 @@ end
   package pkg
 end
 
-# No clue why this isn't created with the packages
-directory '/usr/libexec/crio/conmon'
+directory '/usr/libexec/crio/conmon' do
+  action :delete
+end
+
+link '/usr/libexec/crio/conmon' do
+  to '/usr/bin/conmon'
+end
 
 service 'crio' do
   action [ :enable, :start ]
@@ -73,20 +78,6 @@ service 'kubelet' do
   action [ :enable, :start ]
 end
 
-%w(consul vault traefik).each do |svc|
-  directory "/hab/user/#{svc}/config/" do
-    recursive true
-  end
-
-  template "/hab/user/#{svc}/config/user.toml" do
-    source "#{svc}_user.toml.erb"
-  end
-
-  hab_service "ncerny/#{svc}" do
-    bldr_url node['bldr_url']
-    channel node['pkg_channel']
-    strategy 'at-once'
-    topology 'standalone'
-    retries 3
-  end
+file '/etc/default/kubelet' do
+  content 'KUBELET_EXTRA_ARGS=--cgroup-driver=systemd'
 end

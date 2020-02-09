@@ -2,13 +2,17 @@
   dashboard = true
   insecure = true
 [entryPoints]
-  [entryPoints.web]
+  [entryPoints.http]
     address = ":80"
-  [entryPoints.websecure]
+  [entryPoints.https]
     address = ":443"
+
+
+
+
 [http.routers]
   [http.routers.kubernetes]
-    entryPoints = ["websecure"]
+    entryPoints = ["https"]
     rule = "Host(`kubernetes.management`)"
     service = "kubernetes"
     [http.routers.kubernetes.tls]
@@ -16,8 +20,15 @@
 [http.services]
   [http.services.kubernetes.loadBalancer]
     [[http.services.kubernetes.loadBalancer.servers]]
-      url = "https://virt01.management:6443"
+      url = "https://virt01.home:6443"
     [[http.services.kubernetes.loadBalancer.servers]]
-      url = "https://virt02.management:6443"
+      url = "https://virt02.home:6443"
     [[http.services.kubernetes.loadBalancer.servers]]
-      url = "https://virt03.management:6443"
+      url = "https://virt03.home:6443"
+[tls.stores]
+  [tls.stores.default]
+
+
+
+[entryPoints.http.redirect]
+      entryPoint = "https"

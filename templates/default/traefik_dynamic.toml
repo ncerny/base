@@ -1,0 +1,32 @@
+[http.routers]
+  [http.routers.kubernetes-insecure]
+    rule = "Host(`kubernetes.cerny.cc`)"
+    service = "kubernetes"
+    entrypoints = ["http"]
+    middlewares = ["redirect"]
+  [http.routers.kubernetes]
+    rule = "Host(`kubernetes.cerny.cc`)"
+    service = "kubernetes"
+    entrypoints = ["https"]
+    [http.routers.kubernetes.tls]
+[http.services]
+  [http.services.kubernetes]
+    [http.services.kubernetes.loadBalancer]
+      [[http.services.kubernetes.loadBalancer.servers]]
+        url = "https://virt01.home:6443"
+      [[http.services.kubernetes.loadBalancer.servers]]
+        url = "https://virt02.home:6443"
+      [[http.services.kubernetes.loadBalancer.servers]]
+        url = "https://virt03.home:6443"
+[http.middlewares]
+  [http.middlewares.redirect.redirectScheme]
+    scheme = "https"
+    permanent = true
+
+[tls.stores]
+  [tls.stores.default]
+
+[[tls.certificates]]
+  certFile = "/etc/kubernetes/pki/apiserver.crt"
+  keyFile = "/etc/kubernetes/pki/apiserver.key"
+  stores = ["default"]

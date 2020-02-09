@@ -1,0 +1,18 @@
+[api]
+  dashboard = true
+  insecure = true
+[entryPoints]
+  [entryPoints.http]
+    address = ":80"
+  [entryPoints.https]
+    address = ":443"
+[providers]
+  [providers.file]
+    directory = "/etc/traefik/config.d/"
+    watch = true
+[certificatesResolvers.le.acme]
+  email = "ncerny@gmail.com"
+  storage = "/etc/traefik/acme.json"
+  [certificatesResolvers.le.acme.dnsChallenge]
+    provider = "cloudflare"
+    resolvers = ["173.245.58.177", "173.245.59.104", "2606:4700:50::adf5:3ab1", "2606:4700:58::adf5:3b68"]

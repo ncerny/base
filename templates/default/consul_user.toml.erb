@@ -1,4 +1,6 @@
 server = true
-bootstrap-expect = 3
+bootstrap_expect = 3
+retry_join = ["virt01", "virt02", "virt03"]
 datacenter = "kc"
 ui = true
+bind_addr = "{{ GetInterfaceIP \"bond0\" }}"
