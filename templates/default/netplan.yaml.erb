@@ -3,31 +3,55 @@
       if ::File.exist?('/sys/bus/pci/drivers/mlx4_core')
         # Dell Poweredge Compute Nodes
         {
-          infra_nic: 'eno1',
-          match: 'driver: mlx4_en',
-          parameters: {
-            mode: 'balance-rr',
+          infra: {
+            match: 'driver: bnx2',
+            parameters: {
+              mode: 'balance-rr',
+              'mii-monitor-interval': '100'
+            },
+          },
+          primary: {
+            match: 'driver: mlx4_en',
+            parameters: {
+              mode: 'balance-rr',
             'mii-monitor-interval': '100'
+            }
           }
         }
       elsif ::File.exist?('/sys/bus/pci/drivers/ixgbe')
         # Dell C6100 Storage Nodes
         {
-          infra_nic: 'eno1',
-          match: 'driver: ixgbe',
-          parameters: {
-            mode: '802.3ad',
-            'lacp-rate': 'slow'
+          infra: {
+            match: 'driver: igb',
+            parameters: {
+              mode: 'balance-rr',
+              'mii-monitor-interval': '100'
+            },
+          },
+          primary: {
+            match: 'driver: ixgbe',
+            parameters: {
+              mode: '802.3ad',
+              'lacp-rate': 'slow'
+            }
           }
         }
       else
         # Vagrant
         {
-          infra_nic: 'eth0',
-          match: 'name: eth1',
-          parameters: {
-            mode: 'balance-rr',
-            'mii-monitor-interval': '100'
+          infra: {
+            match: 'name: eth0',
+            parameters: {
+              mode: 'balance-rr',
+              'mii-monitor-interval': '100'
+            },
+          },
+          primary: {
+            match: 'name: eth1',
+            parameters: {
+              mode: 'balance-rr',
+              'mii-monitor-interval': '100'
+            }
           }
         }
       end
@@ -36,44 +60,36 @@ network:
   version: 2
   renderer: networkd
   ethernets:
-    <%= @netconf[:infra_nic] %>:
-      dhcp4: yes
-      dhcp6: no
-      dhcp4-overrides:
-        use-routes: no
-      routes:
-        - to: 192.168.10.0/24
-          via: 192.168.10.1
-          table: 101
-      routing-policy:
-        - from: 192.168.10.0/24
-          table: 101
     switchports:
+      mtu: 1500
+      match:
+        <%= @netconf[:infra][:match] %>
+    10gswitchports:
       mtu: 9000
       match:
-        <%= @netconf[:match] %>
+        <%= @netconf[:primary][:match] %>
   bonds:
     bond0:
       dhcp4: yes
       dhcp6: yes
       mtu: 9000
-      interfaces: [switchports]
-      <%- if @netconf[:parameters] %>
+      interfaces: [10gswitchports]
+      <%- if @netconf[:primary][:parameters] %>
       parameters:
-      <%- @netconf[:parameters].each do |k,v| %>
+      <%- @netconf[:primary][:parameters].each do |k,v| %>
         <%= k %>: <%= v %>
       <%- end %>
       <%- end %>
-      routes:
-        - to: 192.168.100.0/24
-          via: 192.168.100.1
-          table: 102
-      routing-policy:
-        - from: 192.168.100.0/24
-          table: 102
-  vlans:
-    kc:
-      id: 2
-      link: bond0
-      dhcp4: no
+    bond1:
+      dhcp4: yes
       dhcp6: no
+      mtu: 1500
+      dhcp4-overrides:
+        use-routes: no
+      interfaces: [switchports]
+      <%- if @netconf[:infra][:parameters] %>
+      parameters:
+      <%- @netconf[:infra][:parameters].each do |k,v| %>
+        <%= k %>: <%= v %>
+      <%- end %>
+      <%- end %>

@@ -4,11 +4,6 @@
 #
 # Copyright:: 2019, Nathan Cerny, All Rights Reserved.
 
-hostsfile_entry '127.0.0.1' do
-  action :append
-  hostname 'kubernetes.management'
-end
-
 %w(
   overlay
   br_netfilter
@@ -78,8 +73,32 @@ service 'kubelet' do
   action [ :enable, :start ]
 end
 
+template '/hab/user/consul/config/user.toml' do
+  source 'consul_user.toml.erb'
+end
+
+template '/hab/user/vault/config/user.toml' do
+  source 'vault_user.toml.erb'
+end
+
 template '/hab/user/traefik/config/user.toml' do
   source 'traefik_user.toml.erb'
+end
+
+hab_service 'ncerny/consul' do
+  bldr_url node['bldr_url']
+  channel node['pkg_channel']
+  strategy 'at-once'
+  topology 'standalone'
+  retries 3
+end
+
+hab_service 'ncerny/vault' do
+  bldr_url node['bldr_url']
+  channel node['pkg_channel']
+  strategy 'at-once'
+  topology 'standalone'
+  retries 3
 end
 
 hab_service 'ncerny/traefik' do
