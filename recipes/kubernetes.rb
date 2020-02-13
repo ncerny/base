@@ -4,80 +4,42 @@
 #
 # Copyright:: 2019, Nathan Cerny, All Rights Reserved.
 
-%w(
-  overlay
-  br_netfilter
-).each do |mod|
-  kernel_module mod do
-    action :install
+file 'kubernetes.repo' do
+  path '/etc/yum.repos.d/kubernetes.repo'
+  content <<-EOF
+[kubernetes]
+name=Yum Repository
+baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64
+enabled=1
+fastestmirror_enabled=0
+gpgcheck=1
+gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+repo_gpgcheck=1
+EOF
+  notifies :run, 'execute[refresh dnf cache for kubernetes]', :immediately
+end
+
+execute 'refresh dnf cache for kubernetes' do
+  action :nothing
+  command 'dnf makecache --disablerepo * --enablerepo kubernetes'
+end
+
+%w(kubelet kubeadm kubectl).each do |pkg|
+  package pkg do
+    version node['kubernetes']['version']
+    not_if "dnf list --installed #{pkg}-#{node['kubernetes']['version']}"
   end
-end
 
-%w(
-  net.ipv4.ip_forward
-  net.bridge.bridge-nf-call-iptables
-  net.bridge.bridge-nf-call-ip6tables
-).each do |param|
-  sysctl param do
-    value 1
+  execute "dnf-versionlock-#{pkg}" do
+    command "dnf versionlock add #{pkg}"
+    not_if "dnf versionlock | grep #{pkg}"
   end
-end
-
-%w( software-properties-common apt-transport-https ).each do |pkg|
-  package pkg
-end
-
-apt_repository 'crio' do
-  uri 'ppa:projectatomic/ppa'
-end
-
-%w( cri-o-1.15 conmon podman runc ).each do |pkg|
-  package pkg
-end
-
-directory '/usr/libexec/crio/conmon' do
-  action :delete
-end
-
-link '/usr/libexec/crio/conmon' do
-  to '/usr/bin/conmon'
-end
-
-service 'crio' do
-  action [ :enable, :start ]
-end
-
-link '/usr/bin/rm' do
-  to '/bin/rm'
-end
-
-link '/usr/bin/bash' do
-  to '/bin/bash'
-end
-
-service 'crio-shutdown' do
-  action [ :enable, :start ]
-end
-
-apt_repository 'kubernetes' do
-  uri 'https://apt.kubernetes.io/'
-  distribution 'kubernetes-xenial'
-  components ['main']
-  key 'https://packages.cloud.google.com/apt/doc/apt-key.gpg'
-end
-
-%w( kubernetes-cni kubelet kubeadm kubectl ).each do |pkg|
-  package pkg
-
-  execute "apt-mark hold #{pkg}" do
-    not_if "apt-mark showhold | grep #{pkg}"
-  end
-end
-
-service 'kubelet' do
-  action [ :enable, :start ]
 end
 
 file '/etc/default/kubelet' do
   content 'KUBELET_EXTRA_ARGS=--cgroup-driver=systemd'
+end
+
+service 'kubelet' do
+  action [ :enable, :start ]
 end

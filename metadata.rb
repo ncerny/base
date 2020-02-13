@@ -19,3 +19,4 @@ chef_version '>= 15.2'
 # source_url 'https://github.com/<insert_org_here>/base'
 
 depends 'habitat'
+depends 'line'

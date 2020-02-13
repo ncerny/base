@@ -11,7 +11,7 @@ verifier:
   name: inspec
 
 platforms:
-  - name: ubuntu-18.04
+  - name: fedora-31
 
 suites:
   - name: default

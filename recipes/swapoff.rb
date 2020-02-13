@@ -1,11 +1,11 @@
 #
 # Cookbook:: base
-# Recipe:: disable_swap
+# Recipe:: swapoff
 #
 # Copyright:: 2019, Nathan Cerny, All Rights Reserved.
 
 mount 'none' do
-  device "/dev/mapper/#{node['hostname']}--vg-swap_1"
+  device '/dev/mapper/fedora-swap'
   action :disable
   notifies :run, 'execute[swapoff -a]', :immediately
 end
